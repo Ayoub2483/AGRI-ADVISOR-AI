@@ -1,27 +1,35 @@
-# Workspace
+# Kisan Advisor
 
-## Overview
+A bilingual (English / اردو) Expo mobile app that helps Pakistani farmers manage **wheat, rice, cotton, and corn** from sowing to selling.
 
-pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
+## Features
 
-## Stack
+- **Onboarding** — pick language, optionally share location.
+- **Home** — live weather (Open-Meteo, no key), location-aware daily advice (irrigation, heat stress, spray timing, disease risk), quick crop card.
+- **Crop library** — full notes per crop: introduction, requirements, cultivation, sowing/harvesting calendar, growth stages, fertilizer plan, pesticide plan, storage, common diseases.
+- **Disease pages** — symptoms, when it strikes, treatment, prevention.
+- **Scan** — camera or gallery photo → AI analysis (OpenAI GPT-5-mini vision). Bad photos get retake instructions. Good photos get diagnosis + immediate actions + prevention tips.
+- **Market** — indicative wholesale prices in PKR / 40 kg across 6 major Pakistani mandis with daily variation.
+- **Advisor chat** — AI agronomy chatbot that knows the farmer's selected crop, weather and location. History persisted on-device.
+- **Settings** — change language, clear location.
+- **Offline-friendly** — settings, weather snapshot, chat history persisted via `AsyncStorage`. Chat & scan need internet; library, market and theory work offline.
 
-- **Monorepo tool**: pnpm workspaces
-- **Node.js version**: 24
-- **Package manager**: pnpm
-- **TypeScript version**: 5.9
-- **API framework**: Express 5
-- **Database**: PostgreSQL + Drizzle ORM
-- **Validation**: Zod (`zod/v4`), `drizzle-zod`
-- **API codegen**: Orval (from OpenAPI spec)
-- **Build**: esbuild (CJS bundle)
+## Architecture
 
-## Key Commands
+Monorepo (pnpm workspace) with two artifacts:
 
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- `pnpm --filter @workspace/api-server run dev` — run API server locally
+- `artifacts/kisan-advisor` — Expo Router app (mobile + web). Frontend-heavy.
+- `artifacts/api-server` — Express server that exposes:
+  - `POST /api/ai/chat` — bilingual agronomy chat (OpenAI gpt-5-mini)
+  - `POST /api/ai/analyze-crop` — vision analysis returning JSON with health/disease/retake guidance.
+- `artifacts/mockup-sandbox` — design canvas (untouched).
 
-See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+OpenAI is wired through Replit AI Integrations (env vars `AI_INTEGRATIONS_OPENAI_BASE_URL` + `AI_INTEGRATIONS_OPENAI_API_KEY`, no user key required).
+
+## Notable mobile bits
+
+- Inter + Feather icon fonts pre-loaded with SplashScreen gating.
+- `SettingsContext` persists `lang`, `cropId`, `location`, `weather`, `onboarded`.
+- Web uses `navigator.geolocation`; native uses `expo-location`.
+- Body limit raised to 20 MB on the API to accept base64 photos.
+- Urdu strings render with `writingDirection: "rtl"` and slightly larger line-height.

@@ -1,0 +1,32 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "JghZ4RPwHxCZFEwL12qdQ"
+uri = "file://artifacts/kisan-advisor/assets/images/icon.png"
+type = "image"
+title = "kisan advisor app icon"
+
+[[generated]]
+id = "G597BC69ZNP9cFAocW2zL"
+uri = "file://artifacts/kisan-advisor/assets/images/crop-wheat.png"
+type = "image"
+title = "wheat field"
+
+[[generated]]
+id = "YZrqImZZd3VKe2o1oiBxj"
+uri = "file://artifacts/kisan-advisor/assets/images/crop-rice.png"
+type = "image"
+title = "rice paddy"
+
+[[generated]]
+id = "Xo4eMUgryz6hfF0P17ODc"
+uri = "file://artifacts/kisan-advisor/assets/images/crop-cotton.png"
+type = "image"
+title = "cotton plant"
+
+[[generated]]
+id = "Lxmh40_YWAtzI8rPqRsKf"
+uri = "file://artifacts/kisan-advisor/assets/images/crop-corn.png"
+type = "image"
+title = "corn field"

@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "Kisan Advisor",
+    "slug": "kisan-advisor",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "kisan-advisor",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f6f4ec"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Kisan Advisor uses your location to provide local weather and crop advice.",
+        "NSCameraUsageDescription": "Kisan Advisor uses the camera to scan your crop and detect issues.",
+        "NSPhotoLibraryUsageDescription": "Kisan Advisor needs photo access to analyze pictures of your crop."
+      }
+    },
+    "android": {
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://replit.com/"
+        }
+      ],
+      "expo-font",
+      "expo-web-browser",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Kisan Advisor to use your location for local weather and farm advice."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Kisan Advisor to access your photos to analyze your crop.",
+          "cameraPermission": "Allow Kisan Advisor to access your camera to scan your crop."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
