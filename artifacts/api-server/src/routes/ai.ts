@@ -1,13 +1,10 @@
 import { Router, type IRouter } from "express";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const router: IRouter = Router();
 
-const baseURL = process.env["AI_INTEGRATIONS_OPENAI_BASE_URL"];
-const apiKey = process.env["AI_INTEGRATIONS_OPENAI_API_KEY"];
-
-const client =
-  baseURL && apiKey ? new OpenAI({ baseURL, apiKey }) : null;
+const apiKey="AIzaSyA950IC9UsruryJBsHg2HBzIDFdfd7etSg";
+const client = new GoogleGenerativeAI(apiKey);
 
 const SYSTEM_EN = `You are "Kisan Advisor", a friendly, practical agricultural extension officer for farmers in Pakistan and South Asia.
 You ONLY advise on these four crops: wheat, rice, cotton, corn (maize).
@@ -37,29 +34,33 @@ router.post("/ai/chat", async (req, res) => {
   }
 
   try {
-    const completion = await client.chat.completions.create({
-      model: "gpt-5-mini",
-      max_completion_tokens: 800,
-      messages: [
-        { role: "system", content: lang === "ur" ? SYSTEM_UR : SYSTEM_EN },
-        ...history
-          .slice(-10)
-          .filter(
-            (m: unknown): m is { role: "user" | "assistant"; content: string } =>
-              !!m &&
-              typeof m === "object" &&
-              "role" in m &&
-              "content" in m &&
-              ((m as { role: string }).role === "user" ||
-                (m as { role: string }).role === "assistant"),
-          )
-          .map((m) => ({ role: m.role, content: String(m.content).slice(0, 2000) })),
-        { role: "user", content: message },
-      ],
+    const model = client.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      systemInstruction: lang === "ur" ? SYSTEM_UR : SYSTEM_EN,
     });
-    const reply = completion.choices[0]?.message?.content ?? "";
+
+    const chatHistory = history
+      .slice(-10)
+      .filter(
+        (m: unknown): m is { role: "user" | "assistant"; content: string } =>
+          !!m &&
+          typeof m === "object" &&
+          "role" in m &&
+          "content" in m &&
+          ((m as { role: string }).role === "user" ||
+            (m as { role: string }).role === "assistant"),
+      )
+      .map((m: { role: "user" | "assistant"; content: string }) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: String(m.content).slice(0, 2000) }],
+      }));
+
+    const chat = model.startChat({ history: chatHistory });
+    const result = await chat.sendMessage(message);
+    const reply = result.response.text();
     res.json({ reply });
   } catch (err) {
+    console.error("CHAT ERROR DETAILS:, err");
     req.log.error({ err }, "ai chat failed");
     res.status(500).json({ error: "ai chat failed" });
   }
@@ -105,25 +106,14 @@ Reply ONLY in valid minified JSON matching this TypeScript type, with all human-
 No markdown, no commentary, only JSON.`;
 
   try {
-    const completion = await client.chat.completions.create({
-      model: "gpt-5-mini",
-      max_completion_tokens: 1200,
-      response_format: { type: "json_object" },
-      messages: [
-        {
-          role: "user",
-          content: [
-            { type: "text", text: prompt },
-            {
-              type: "image_url",
-              image_url: { url: `data:${mimeType};base64,${imageBase64}` },
-            },
-          ],
-        },
-      ],
-    });
+    const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const raw = completion.choices[0]?.message?.content ?? "{}";
+    const result = await model.generateContent([
+      { inlineData: { mimeType: mimeType, data: imageBase64 } },
+      prompt,
+    ]);
+
+    const raw = result.response.text().replace(/```json|```/g, "").trim();
     let parsed: unknown;
     try {
       parsed = JSON.parse(raw);

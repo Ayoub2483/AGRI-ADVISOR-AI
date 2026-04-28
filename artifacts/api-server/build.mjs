@@ -64,7 +64,6 @@ async function buildAll() {
       "@azure/*",
       "@opentelemetry/*",
       "@google-cloud/*",
-      "@google/*",
       "googleapis",
       "firebase-admin",
       "@parcel/watcher",
@@ -101,6 +100,10 @@ async function buildAll() {
       "puppeteer-core",
       "electron",
     ],
+    define: {
+      'process.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY || ''),
+      'process.env.PORT': JSON.stringify(process.env.PORT || '3000'),
+    },
     sourcemap: "linked",
     plugins: [
       // pino relies on workers to handle logging, instead of externalizing it we use a plugin to handle it

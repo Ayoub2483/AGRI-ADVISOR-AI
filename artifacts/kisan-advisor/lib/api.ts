@@ -2,14 +2,7 @@ import Constants from "expo-constants";
 import { Platform } from "react-native";
 
 export function getApiBase(): string {
-  const domain = process.env.EXPO_PUBLIC_DOMAIN;
-  if (domain) return `https://${domain}/api`;
-  if (Platform.OS === "web" && typeof window !== "undefined") {
-    return `${window.location.origin}/api`;
-  }
-  const host = Constants.expoConfig?.hostUri?.split(":")[0];
-  if (host) return `http://${host}:80/api`;
-  return "/api";
+  return "https://brave-buses-add.loca.lt/api";
 }
 
 export async function aiChat(params: {
@@ -19,7 +12,7 @@ export async function aiChat(params: {
 }): Promise<string> {
   const res = await fetch(`${getApiBase()}/ai/chat`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "bypass-tunnel-reminder": "true" },
     body: JSON.stringify(params),
   });
   if (!res.ok) throw new Error(`Chat failed: ${res.status}`);
@@ -50,7 +43,7 @@ export async function analyzeCropImage(params: {
 }): Promise<CropAnalysis> {
   const res = await fetch(`${getApiBase()}/ai/analyze-crop`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "bypass-tunnel-reminder": "true" },
     body: JSON.stringify(params),
   });
   if (!res.ok) throw new Error(`Analyze failed: ${res.status}`);
